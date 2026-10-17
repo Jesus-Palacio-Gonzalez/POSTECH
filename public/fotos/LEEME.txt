@@ -1,0 +1,7 @@
+Coloca aqui las fotos de stock (Unsplash, Pexels, Pixabay) con estos nombres exactos:
+
+  hero-taller.jpg     Mecanico trabajando en una moto (horizontal, minimo 1400 px de ancho)
+  taller.jpg          Interior de taller de motos
+  repuestos.jpg       Estanteria / mostrador de repuestos
+
+Si un archivo no existe, la landing muestra un marco de carrera en su lugar.

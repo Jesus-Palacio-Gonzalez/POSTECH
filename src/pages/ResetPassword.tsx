@@ -7,7 +7,7 @@ import { useAuth } from '../context/AuthContext'
 import { supabase, traducirError } from '../lib/supabase'
 
 const campo =
-  'w-full rounded-xl border border-ink-200 bg-white px-4 py-3 text-sm font-semibold text-ink-900 outline-none transition placeholder:text-ink-500 focus:border-brand-500 focus:ring-4 focus:ring-brand-100'
+  'w-full border-2 border-ink-200 bg-white px-4 py-3 text-sm font-semibold text-ink-900 outline-none transition placeholder:text-ink-500 focus:border-brand-500'
 
 export default function ResetPassword() {
   const { session, loading } = useAuth()
@@ -45,12 +45,12 @@ export default function ResetPassword() {
         <Logo />
       </Link>
 
-      <div className="w-full max-w-sm rounded-3xl border border-ink-100 bg-white p-8 shadow-xl shadow-ink-900/5">
-        <h1 className="text-2xl font-extrabold tracking-tight text-ink-950">Nueva contraseña</h1>
+      <div className="w-full max-w-sm border border-ink-100 bg-white p-8 border-t-4 border-t-brand-500">
+        <h1 className="display text-4xl text-ink-950">Nueva contraseña</h1>
 
         {loading ? (
           <div className="mt-8 flex justify-center">
-            <Loader2 className="animate-spin text-brand-600" />
+            <Loader2 className="animate-spin text-brand-500" />
           </div>
         ) : !session ? (
           <div className="mt-4 space-y-5">
@@ -59,13 +59,13 @@ export default function ResetPassword() {
             </p>
             <Link
               to="/login?modo=recuperar"
-              className="block rounded-xl bg-brand-600 py-3.5 text-center text-sm font-bold text-white transition hover:bg-brand-700"
+              className="slant-both block bg-brand-500 py-3.5 text-center text-sm font-extrabold uppercase tracking-wider text-ink-950 transition hover:bg-brand-400"
             >
               Solicitar nuevo enlace
             </Link>
           </div>
         ) : listo ? (
-          <div className="mt-5 flex gap-2.5 rounded-xl border border-brand-200 bg-brand-50 p-3.5 text-sm font-semibold text-brand-800">
+          <div className="mt-5 flex gap-2.5 border border-brand-200 bg-brand-50 p-3.5 text-sm font-semibold text-brand-800">
             <CheckCircle2 size={18} className="mt-0.5 shrink-0" /> Contraseña actualizada. Entrando al panel…
           </div>
         ) : (
@@ -84,7 +84,7 @@ export default function ResetPassword() {
             </div>
 
             {error && (
-              <div role="alert" className="flex gap-2.5 rounded-xl border border-red-200 bg-red-50 p-3.5 text-sm font-semibold text-red-800">
+              <div role="alert" className="flex gap-2.5 border border-red-200 bg-red-50 p-3.5 text-sm font-semibold text-red-800">
                 <AlertCircle size={18} className="mt-0.5 shrink-0" /> {error}
               </div>
             )}
@@ -92,7 +92,7 @@ export default function ResetPassword() {
             <button
               type="submit"
               disabled={cargando}
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-brand-600 py-3.5 text-sm font-bold text-white transition hover:bg-brand-700 disabled:opacity-70"
+              className="flex w-full items-center justify-center gap-2 slant-both bg-brand-500 py-3.5 text-sm font-extrabold uppercase tracking-wider text-ink-950 transition hover:bg-brand-400 disabled:opacity-70"
             >
               {cargando && <Loader2 size={18} className="animate-spin" />} Guardar contraseña
             </button>

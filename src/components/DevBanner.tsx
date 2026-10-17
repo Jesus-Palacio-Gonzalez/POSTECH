@@ -1,13 +1,12 @@
-import { Construction } from 'lucide-react'
-
 export function DevBanner() {
   return (
     <div
       role="status"
-      className="flex items-center justify-center gap-2 bg-amber-400 px-4 py-2 text-center text-xs font-extrabold uppercase tracking-wider text-ink-950 sm:text-sm"
+      className="relative flex items-center justify-center gap-3 overflow-hidden bg-ink-950 px-4 py-2 text-center text-xs font-extrabold uppercase tracking-[0.2em] text-brand-500 sm:text-sm"
     >
-      <Construction size={16} className="shrink-0" aria-hidden="true" />
+      <span className="checker hidden h-3 w-10 sm:block" aria-hidden="true" />
       Sistema en desarrollo
+      <span className="checker hidden h-3 w-10 sm:block" aria-hidden="true" />
     </div>
   )
 }

@@ -8,13 +8,13 @@ import { isSupabaseConfigured, supabase, traducirError } from '../lib/supabase'
 type Modo = 'login' | 'registro' | 'recuperar'
 
 const titulos: Record<Modo, { h: string; p: string }> = {
-  login: { h: 'Bienvenido de vuelta', p: 'Ingresa a tu cuenta para continuar vendiendo.' },
-  registro: { h: 'Crea tu cuenta', p: 'Empieza gratis y configura tu negocio en minutos.' },
+  login: { h: 'Arranca tu turno', p: 'Ingresa a tu cuenta para seguir con tu taller o almacén.' },
+  registro: { h: 'Crea tu cuenta', p: 'Empieza gratis y configura tu taller o almacén en minutos.' },
   recuperar: { h: 'Recupera tu contraseña', p: 'Te enviaremos un enlace para crear una nueva.' },
 }
 
 const campo =
-  'w-full rounded-xl border border-ink-200 bg-white px-4 py-3 text-sm font-semibold text-ink-900 outline-none transition placeholder:text-ink-500 focus:border-brand-500 focus:ring-4 focus:ring-brand-100'
+  'w-full border-2 border-ink-200 bg-white px-4 py-3 text-sm font-semibold text-ink-900 outline-none transition placeholder:text-ink-500 focus:border-brand-500'
 
 function GoogleIcon() {
   return (
@@ -115,11 +115,11 @@ export default function Login() {
         </div>
 
         <div className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center py-10">
-          <h1 className="text-3xl font-extrabold tracking-tight text-ink-950">{titulos[modo].h}</h1>
+          <h1 className="display text-5xl text-ink-950">{titulos[modo].h}</h1>
           <p className="mt-2 text-ink-700">{titulos[modo].p}</p>
 
           {!isSupabaseConfigured && (
-            <div className="mt-6 flex gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm font-semibold text-amber-900">
+            <div className="mt-6 flex gap-3 border border-amber-200 bg-amber-50 p-4 text-sm font-semibold text-amber-900">
               <AlertCircle size={18} className="mt-0.5 shrink-0" />
               <p>
                 Supabase aún no está conectado. Copia <code>.env.example</code> a <code>.env</code> y completa las dos
@@ -133,7 +133,7 @@ export default function Login() {
               <button
                 type="button"
                 onClick={conGoogle}
-                className="mt-8 flex w-full items-center justify-center gap-3 rounded-xl border border-ink-200 bg-white py-3 text-sm font-bold text-ink-900 transition hover:bg-ink-50"
+                className="mt-8 flex w-full items-center justify-center gap-3 border-2 border-ink-200 bg-white py-3 text-sm font-bold text-ink-900 transition hover:border-ink-950"
               >
                 <GoogleIcon /> Continuar con Google
               </button>
@@ -150,13 +150,13 @@ export default function Login() {
                   <label htmlFor="nombre" className="mb-1.5 block text-sm font-bold">
                     Tu nombre
                   </label>
-                  <input id="nombre" required autoComplete="name" value={nombre} onChange={(e) => setNombre(e.target.value)} className={campo} placeholder="María Pérez" />
+                  <input id="nombre" required autoComplete="name" value={nombre} onChange={(e) => setNombre(e.target.value)} className={campo} placeholder="Carlos Martínez" />
                 </div>
                 <div>
                   <label htmlFor="negocio" className="mb-1.5 block text-sm font-bold">
-                    Nombre del negocio
+                    Nombre del taller o almacén
                   </label>
-                  <input id="negocio" required autoComplete="organization" value={negocio} onChange={(e) => setNegocio(e.target.value)} className={campo} placeholder="Cafetería El Roble" />
+                  <input id="negocio" required autoComplete="organization" value={negocio} onChange={(e) => setNegocio(e.target.value)} className={campo} placeholder="Taller Moto Veloz" />
                 </div>
               </>
             )}
@@ -205,12 +205,12 @@ export default function Login() {
             )}
 
             {error && (
-              <div role="alert" className="flex gap-2.5 rounded-xl border border-red-200 bg-red-50 p-3.5 text-sm font-semibold text-red-800">
+              <div role="alert" className="flex gap-2.5 border border-red-200 bg-red-50 p-3.5 text-sm font-semibold text-red-800">
                 <AlertCircle size={18} className="mt-0.5 shrink-0" /> {error}
               </div>
             )}
             {aviso && (
-              <div role="status" className="flex gap-2.5 rounded-xl border border-brand-200 bg-brand-50 p-3.5 text-sm font-semibold text-brand-800">
+              <div role="status" className="flex gap-2.5 border border-brand-200 bg-brand-50 p-3.5 text-sm font-semibold text-brand-800">
                 <CheckCircle2 size={18} className="mt-0.5 shrink-0" /> {aviso}
               </div>
             )}
@@ -218,7 +218,7 @@ export default function Login() {
             <button
               type="submit"
               disabled={cargando}
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-brand-600 py-3.5 text-sm font-bold text-white shadow-lg shadow-brand-600/20 transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-70"
+              className="flex w-full items-center justify-center gap-2 slant-both bg-brand-500 py-3.5 text-sm font-extrabold uppercase tracking-wider text-ink-950 transition hover:bg-brand-400 disabled:cursor-not-allowed disabled:opacity-70"
             >
               {cargando && <Loader2 size={18} className="animate-spin" />}
               {modo === 'login' ? 'Iniciar sesión' : modo === 'registro' ? 'Crear cuenta' : 'Enviar enlace'}
@@ -251,23 +251,31 @@ export default function Login() {
         </div>
       </main>
 
-      <aside className="relative hidden overflow-hidden bg-ink-950 p-14 text-white lg:flex lg:flex-col lg:justify-between" aria-hidden="true">
-        <div className="absolute -right-24 -top-24 h-96 w-96 rounded-full bg-brand-600/30 blur-3xl" />
-        <div className="absolute -bottom-32 -left-20 h-96 w-96 rounded-full bg-brand-400/20 blur-3xl" />
-        <Logo tone="light" className="relative" />
-        <div className="relative">
-          <p className="text-4xl font-extrabold leading-tight tracking-tight">
-            Tu negocio, <span className="text-brand-400">bajo control</span> desde el primer día.
+      <aside className="relative hidden overflow-hidden bg-ink-950 text-white lg:flex lg:flex-col lg:justify-between" aria-hidden="true">
+        <div className="stripes absolute inset-0" />
+        <div className="relative p-14">
+          <Logo tone="light" />
+        </div>
+        <div className="relative px-14">
+          <p className="display text-7xl">
+            Más motos
+            <br />
+            <span className="text-brand-500">saliendo</span>
+            <br />
+            listas
           </p>
           <ul className="mt-8 space-y-3 text-ink-200">
-            {['Ventas rápidas desde cualquier dispositivo', 'Inventario que se actualiza solo', 'Reportes claros para decidir mejor'].map((t) => (
-              <li key={t} className="flex items-center gap-3 font-semibold">
-                <CheckCircle2 size={20} className="text-brand-400" /> {t}
+            {['Mostrador rápido con búsqueda por referencia', 'Órdenes de taller por placa', 'Inventario que se actualiza solo'].map((t) => (
+              <li key={t} className="flex items-center gap-3 font-bold">
+                <CheckCircle2 size={20} className="text-brand-500" /> {t}
               </li>
             ))}
           </ul>
         </div>
-        <p className="relative text-sm font-semibold text-ink-300">© {new Date().getFullYear()} POSTECH</p>
+        <div className="relative mt-10">
+          <div className="checker h-5 w-full" />
+          <p className="p-6 text-sm font-semibold text-ink-300">© {new Date().getFullYear()} POSTECH</p>
+        </div>
       </aside>
     </div>
   )

@@ -5,7 +5,7 @@ function Cargando() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-ink-50">
       <div
-        className="h-9 w-9 animate-spin rounded-full border-4 border-brand-100 border-t-brand-600"
+        className="h-9 w-9 animate-spin rounded-full border-4 border-ink-200 border-t-brand-500"
         role="status"
         aria-label="Cargando"
       />

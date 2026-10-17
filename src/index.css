@@ -1,25 +1,28 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Barlow", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Barlow Condensed", "Barlow", ui-sans-serif, sans-serif;
 
-  --color-ink-950: #0a1a21;
-  --color-ink-900: #10252e;
-  --color-ink-700: #33505c;
-  --color-ink-500: #5f7a86;
-  --color-ink-300: #b7c6cd;
-  --color-ink-200: #d8e2e6;
-  --color-ink-100: #eaf0f2;
-  --color-ink-50: #f5f8f9;
+  /* Neutros cálidos: asfalto y papel */
+  --color-ink-950: #0b0b0c;
+  --color-ink-900: #151517;
+  --color-ink-700: #3d3d42;
+  --color-ink-500: #6b6b72;
+  --color-ink-300: #b9b9bd;
+  --color-ink-200: #deded9;
+  --color-ink-100: #ebebe6;
+  --color-ink-50: #f6f6f2;
 
-  --color-brand-50: #e9fbf7;
-  --color-brand-100: #c7f5ec;
-  --color-brand-200: #96ead9;
-  --color-brand-400: #2dc7b2;
-  --color-brand-500: #14b8a6;
-  --color-brand-600: #0d9488;
-  --color-brand-700: #0f766e;
-  --color-brand-800: #115e59;
+  /* Naranja de carrera */
+  --color-brand-50: #fff1e8;
+  --color-brand-100: #ffdcc7;
+  --color-brand-200: #ffb98f;
+  --color-brand-400: #ff8a3d;
+  --color-brand-500: #ff6a13;
+  --color-brand-600: #f25600;
+  --color-brand-700: #c94500;
+  --color-brand-800: #8f3200;
 }
 
 html {
@@ -35,5 +38,49 @@ body {
 }
 
 ::selection {
-  background: var(--color-brand-100);
+  background: var(--color-brand-500);
+  color: var(--color-ink-950);
+}
+
+/* Titulares: condensada, cursiva y en mayúsculas (look de carrera) */
+.display {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  line-height: 0.95;
+}
+
+/* Bandera de cuadros */
+.checker {
+  background-color: #fff;
+  background-image:
+    linear-gradient(45deg, #0b0b0c 25%, transparent 25%, transparent 75%, #0b0b0c 75%),
+    linear-gradient(45deg, #0b0b0c 25%, transparent 25%, transparent 75%, #0b0b0c 75%);
+  background-size: 20px 20px;
+  background-position: 0 0, 10px 10px;
+}
+
+/* Franjas diagonales */
+.stripes {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    rgba(255, 106, 19, 0.16) 0 10px,
+    transparent 10px 22px
+  );
+}
+
+/* Corte diagonal estilo velocidad */
+.slant {
+  clip-path: polygon(0 0, 100% 0, calc(100% - 18px) 100%, 0 100%);
+}
+.slant-both {
+  clip-path: polygon(14px 0, 100% 0, calc(100% - 14px) 100%, 0 100%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }

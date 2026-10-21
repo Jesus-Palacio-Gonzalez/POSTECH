@@ -29,3 +29,12 @@ export function traducirError(message: string): string {
   }
   return 'Ocurrió un error inesperado. Inténtalo de nuevo.'
 }
+
+/**
+ * Errores de las funciones de la base de datos (registrar_venta, anular_venta…): sus mensajes
+ * ya están en español y dicen qué pasó ("Stock insuficiente de…"), así que se muestran tal cual.
+ */
+export function mensajeFuncion(err: { message?: string; code?: string }): string {
+  if ((err.code === 'P0001' || err.code === '42501') && err.message) return err.message
+  return traducirError(err.message ?? '')
+}

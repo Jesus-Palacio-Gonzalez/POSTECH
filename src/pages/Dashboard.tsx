@@ -1,7 +1,8 @@
 import { useState } from 'react'
+import type { FormEvent } from 'react'
 import {
   AlertTriangle,
-  Bike,
+  Pencil,
   Boxes,
   ClipboardList,
   Gauge,
@@ -19,6 +20,9 @@ import {
 import type { LucideIcon } from 'lucide-react'
 import { Logo } from '../components/Logo'
 import { useAuth } from '../context/AuthContext'
+import { etiquetaRol, useNegocio } from '../context/NegocioContext'
+import { useResumen } from '../hooks/useResumen'
+import type { EstadoOrden } from '../hooks/useResumen'
 
 const modulos: Array<{ icon: LucideIcon; label: string }> = [
   { icon: LayoutDashboard, label: 'Resumen' },
@@ -30,46 +34,84 @@ const modulos: Array<{ icon: LucideIcon; label: string }> = [
   { icon: Settings, label: 'Configuración' },
 ]
 
-const kpis: Array<{ icon: LucideIcon; label: string; value: string; delta: string }> = [
-  { icon: Wallet, label: 'Ventas de hoy', value: '$2.480.500', delta: '+18,4%' },
-  { icon: Wrench, label: 'Motos en taller', value: '9', delta: '3 listas' },
-  { icon: Receipt, label: 'Ventas de mostrador', value: '47', delta: '+9,2%' },
-  { icon: Bike, label: 'Mano de obra hoy', value: '$612.000', delta: '+6,1%' },
-]
-
-const semana = [
-  { d: 'Lun', v: 1.42 },
-  { d: 'Mar', v: 1.78 },
-  { d: 'Mié', v: 1.55 },
-  { d: 'Jue', v: 2.1 },
-  { d: 'Vie', v: 2.62 },
-  { d: 'Sáb', v: 3.05 },
-  { d: 'Dom', v: 2.48 },
-]
-
-type Estado = 'Recibida' | 'Diagnóstico' | 'Reparación' | 'Lista'
-
-const ordenes: Array<{ id: string; placa: string; moto: string; trabajo: string; mecanico: string; estado: Estado }> = [
-  { id: '#318', placa: 'KJH 47F', moto: 'Pulsar NS200', trabajo: 'Cambio de kit de arrastre', mecanico: 'Wilmer', estado: 'Reparación' },
-  { id: '#317', placa: 'HDR 82D', moto: 'AKT NKD 125', trabajo: 'Mantenimiento general', mecanico: 'Jhon', estado: 'Lista' },
-  { id: '#316', placa: 'MXC 19B', moto: 'Yamaha FZ 2.0', trabajo: 'Diagnóstico eléctrico', mecanico: 'Wilmer', estado: 'Diagnóstico' },
-  { id: '#315', placa: 'PLA 55E', moto: 'Honda CB 190R', trabajo: 'Cambio de pastillas', mecanico: 'Andrés', estado: 'Recibida' },
-  { id: '#314', placa: 'TRS 03C', moto: 'Suzuki Gixxer 150', trabajo: 'Cambio de aceite y filtro', mecanico: 'Jhon', estado: 'Lista' },
-]
-
-const colorEstado: Record<Estado, string> = {
-  Recibida: 'bg-ink-100 text-ink-700',
-  Diagnóstico: 'bg-amber-100 text-amber-800',
-  Reparación: 'bg-brand-100 text-brand-800',
-  Lista: 'bg-emerald-100 text-emerald-800',
+const etiquetaEstado: Record<EstadoOrden, string> = {
+  recibida: 'Recibida',
+  diagnostico: 'Diagnóstico',
+  reparacion: 'Reparación',
+  lista: 'Lista',
 }
 
-const stockBajo = [
-  { n: 'Kit de arrastre 428H 43/14', q: 2 },
-  { n: 'Pastillas de freno delanteras', q: 4 },
-  { n: 'Aceite 20W-50 (litro)', q: 6 },
-  { n: 'Bujía CR8E', q: 5 },
-]
+const colorEstado: Record<EstadoOrden, string> = {
+  recibida: 'bg-ink-100 text-ink-700',
+  diagnostico: 'bg-amber-100 text-amber-800',
+  reparacion: 'bg-brand-100 text-brand-800',
+  lista: 'bg-emerald-100 text-emerald-800',
+}
+
+const cop = new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 })
+
+function Vacio({ children }: { children: string }) {
+  return <p className="mt-5 bg-ink-50 px-4 py-6 text-center text-sm font-semibold text-ink-500">{children}</p>
+}
+
+/** Nombre del negocio con edición en línea para dueño y administrador. */
+function NombreNegocio() {
+  const { negocio, rol, renombrar } = useNegocio()
+  const [editando, setEditando] = useState(false)
+  const [valor, setValor] = useState('')
+  const [error, setError] = useState<string | null>(null)
+  const [guardando, setGuardando] = useState(false)
+  const puede = rol === 'dueno' || rol === 'admin'
+
+  async function guardar(e: FormEvent) {
+    e.preventDefault()
+    setGuardando(true)
+    const msg = await renombrar(valor)
+    setGuardando(false)
+    if (msg) setError(msg)
+    else setEditando(false)
+  }
+
+  if (editando) {
+    return (
+      <form onSubmit={guardar} className="flex flex-wrap items-center gap-2">
+        <input
+          autoFocus
+          aria-label="Nombre del negocio"
+          value={valor}
+          onChange={(e) => setValor(e.target.value)}
+          className="border-2 border-ink-950 bg-white px-2 py-1 text-sm font-bold"
+        />
+        <button disabled={guardando} className="bg-brand-500 px-3 py-1 text-xs font-extrabold uppercase text-ink-950">
+          Guardar
+        </button>
+        <button type="button" onClick={() => setEditando(false)} className="text-xs font-bold uppercase text-ink-500">
+          Cancelar
+        </button>
+        {error && <span role="alert" className="w-full text-xs font-bold text-red-700">{error}</span>}
+      </form>
+    )
+  }
+  return (
+    <p className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-ink-500">
+      {negocio?.nombre ?? 'Tu negocio'}
+      {puede && (
+        <button
+          type="button"
+          aria-label="Cambiar nombre del negocio"
+          onClick={() => {
+            setValor(negocio?.nombre ?? '')
+            setError(null)
+            setEditando(true)
+          }}
+          className="text-ink-500 hover:text-brand-600"
+        >
+          <Pencil size={13} />
+        </button>
+      )}
+    </p>
+  )
+}
 
 function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
   return (
@@ -95,17 +137,26 @@ function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
 
 export default function Dashboard() {
   const { user, signOut } = useAuth()
+  const { negocio, rol } = useNegocio()
   const [menu, setMenu] = useState(false)
 
-  const meta = (user?.user_metadata ?? {}) as { full_name?: string; business_name?: string }
-  const nombre = meta.full_name || user?.email?.split('@')[0] || 'Usuario'
-  const negocio = meta.business_name || 'Tu taller'
-  const max = Math.max(...semana.map((s) => s.v))
+  const meta = (user?.user_metadata ?? {}) as { full_name?: string; name?: string }
+  const nombre = meta.full_name || meta.name || user?.email?.split('@')[0] || 'Usuario'
+  const nombreNegocio = negocio?.nombre ?? 'Tu negocio'
+  const { datos, error: errorDatos, cargando: cargandoDatos, recargar } = useResumen()
+  const semana = datos?.semana ?? []
+  const max = Math.max(1, ...semana.map((s) => s.total))
+  const kpis: Array<{ icon: LucideIcon; label: string; value: string; nota: string }> = [
+    { icon: Wallet, label: 'Ventas de hoy', value: datos?.veVentas ? cop.format(datos.ventasHoy) : '—', nota: datos?.veVentas ? 'completadas' : 'sin acceso' },
+    { icon: Receipt, label: 'Ventas de mostrador', value: datos?.veVentas ? String(datos.cantidadVentasHoy) : '—', nota: 'hoy' },
+    { icon: Wrench, label: 'Motos en taller', value: String(datos?.motosEnTaller ?? 0), nota: `${datos?.motosListas ?? 0} listas` },
+    { icon: AlertTriangle, label: 'Productos con stock bajo', value: String(datos?.stockBajo.length ?? 0), nota: 'revisar' },
+  ]
 
   return (
     <div className="min-h-screen bg-ink-50 lg:grid lg:grid-cols-[17rem_1fr]">
       {/* Barra lateral (escritorio) */}
-      <aside className="sticky top-0 hidden h-screen flex-col border-r border-ink-200 bg-white lg:flex">
+      <aside className="sticky top-0 hidden h-[calc(100vh-2.25rem)] flex-col border-r border-ink-200 bg-white lg:flex">
         <div className="px-6 py-5">
           <Logo />
         </div>
@@ -149,14 +200,17 @@ export default function Dashboard() {
               <Menu size={22} />
             </button>
             <div>
-              <p className="text-xs font-bold uppercase tracking-widest text-ink-500">{negocio}</p>
+              <NombreNegocio />
               <p className="display text-xl text-ink-950">Resumen</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
             <div className="hidden text-right sm:block">
               <p className="text-sm font-extrabold text-ink-950">{nombre}</p>
-              <p className="text-xs font-semibold text-ink-500">{user?.email}</p>
+              <p className="text-xs font-semibold text-ink-500">
+                {rol ? `${etiquetaRol[rol]} · ` : ''}
+                {user?.email}
+              </p>
             </div>
             <span className="slant-both grid h-10 w-12 place-items-center bg-brand-500 text-base font-extrabold uppercase text-ink-950" aria-hidden="true">
               {nombre.slice(0, 1)}
@@ -167,15 +221,22 @@ export default function Dashboard() {
         <main className="space-y-6 p-5 sm:p-8">
           <div>
             <h1 className="display text-5xl text-ink-950">Hola, {nombre}</h1>
-            <p className="mt-2 font-semibold text-ink-700">Así va {negocio} hoy. Los datos mostrados son de ejemplo.</p>
+            <p className="mt-2 font-semibold text-ink-700">Así va {nombreNegocio} hoy.</p>
           </div>
 
-          <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="Indicadores">
-            {kpis.map(({ icon: Icon, label, value, delta }) => (
+          {errorDatos && (
+            <div role="alert" className="flex items-center justify-between gap-3 border-l-4 border-red-600 bg-red-50 px-4 py-3 text-sm font-semibold text-red-800">
+              <span>{errorDatos}</span>
+              <button type="button" onClick={() => void recargar()} className="font-extrabold uppercase">Reintentar</button>
+            </div>
+          )}
+
+          <section className={`grid gap-4 sm:grid-cols-2 xl:grid-cols-4 ${cargandoDatos ? 'opacity-60' : ''}`} aria-label="Indicadores">
+            {kpis.map(({ icon: Icon, label, value, nota }) => (
               <article key={label} className="border-t-4 border-brand-500 bg-white p-5">
                 <div className="flex items-center justify-between">
                   <Icon size={22} className="text-ink-700" />
-                  <span className="bg-ink-950 px-2.5 py-1 text-xs font-extrabold uppercase tracking-wide text-brand-500">{delta}</span>
+                  <span className="bg-ink-950 px-2.5 py-1 text-xs font-extrabold uppercase tracking-wide text-brand-500">{nota}</span>
                 </div>
                 <p className="mt-4 text-xs font-bold uppercase tracking-widest text-ink-500">{label}</p>
                 <p className="display mt-1 text-4xl text-ink-950">{value}</p>
@@ -189,32 +250,40 @@ export default function Dashboard() {
                 <h2 className="display text-2xl text-ink-950">Ventas de la semana</h2>
                 <span className="text-xs font-bold uppercase tracking-widest text-ink-500">Millones COP</span>
               </div>
-              <div className="mt-6 flex h-52 items-end gap-3">
-                {semana.map((s, i) => (
-                  <div key={s.d} className="flex h-full flex-1 flex-col items-center justify-end gap-2">
-                    <span className="text-xs font-bold text-ink-700">{s.v.toFixed(2)}</span>
-                    <div
-                      className={`w-full ${i === semana.length - 1 ? 'bg-brand-500' : 'bg-ink-950'}`}
-                      style={{ height: `${(s.v / max) * 78}%` }}
-                    />
-                    <span className="text-xs font-bold uppercase text-ink-500">{s.d}</span>
-                  </div>
-                ))}
-              </div>
+              {datos && !datos.veVentas ? (
+                <Vacio>Tu rol no incluye el detalle de ventas.</Vacio>
+              ) : (
+                <div className="mt-6 flex h-52 items-end gap-3">
+                  {semana.map((d) => (
+                    <div key={d.dia + d.hoy} className="flex h-full flex-1 flex-col items-center justify-end gap-2">
+                      <span className="text-xs font-bold text-ink-700">{d.total ? (d.total / 1_000_000).toFixed(2) : '0'}</span>
+                      <div
+                        className={`w-full ${d.hoy ? 'bg-brand-500' : 'bg-ink-950'}`}
+                        style={{ height: `${Math.max(d.total ? 2 : 0.5, (d.total / max) * 78)}%` }}
+                      />
+                      <span className="text-xs font-bold uppercase text-ink-500">{d.dia}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </section>
 
             <section className="bg-white p-6" aria-label="Stock bajo">
               <h2 className="display flex items-center gap-2 text-2xl text-ink-950">
                 <AlertTriangle size={20} className="text-brand-600" /> Stock bajo
               </h2>
-              <ul className="mt-5 space-y-2.5">
-                {stockBajo.map((p) => (
-                  <li key={p.n} className="flex items-center justify-between gap-3 bg-ink-50 px-4 py-3">
-                    <span className="text-sm font-semibold text-ink-700">{p.n}</span>
-                    <span className="shrink-0 bg-brand-500 px-2.5 py-1 text-xs font-extrabold text-ink-950">{p.q} uds</span>
-                  </li>
-                ))}
-              </ul>
+              {datos && datos.stockBajo.length === 0 ? (
+                <Vacio>Todo el inventario está por encima del mínimo.</Vacio>
+              ) : (
+                <ul className="mt-5 space-y-2.5">
+                  {(datos?.stockBajo ?? []).slice(0, 6).map((p) => (
+                    <li key={p.id} className="flex items-center justify-between gap-3 bg-ink-50 px-4 py-3">
+                      <span className="text-sm font-semibold text-ink-700">{p.nombre}</span>
+                      <span className="shrink-0 bg-brand-500 px-2.5 py-1 text-xs font-extrabold text-ink-950">{p.stock} uds</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </section>
           </div>
 
@@ -232,9 +301,9 @@ export default function Dashboard() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-ink-100 font-semibold text-ink-700">
-                  {ordenes.map((o) => (
+                  {(datos?.ordenes ?? []).map((o) => (
                     <tr key={o.id}>
-                      <td className="px-6 py-3.5 font-extrabold text-ink-950">{o.id}</td>
+                      <td className="px-6 py-3.5 font-extrabold text-ink-950">{o.numero ? `#${o.numero}` : '—'}</td>
                       <td className="px-6 py-3.5">
                         <span className="rounded-sm border-2 border-ink-950 bg-amber-300 px-2 py-0.5 font-display text-base font-extrabold tracking-wider text-ink-950">
                           {o.placa}
@@ -247,7 +316,7 @@ export default function Dashboard() {
                       <td className="px-6 py-3.5">{o.mecanico}</td>
                       <td className="px-6 py-3.5">
                         <span className={`px-2.5 py-1 text-xs font-extrabold uppercase tracking-wide ${colorEstado[o.estado]}`}>
-                          {o.estado}
+                          {etiquetaEstado[o.estado]}
                         </span>
                       </td>
                     </tr>
@@ -255,6 +324,9 @@ export default function Dashboard() {
                 </tbody>
               </table>
             </div>
+            {datos && datos.ordenes.length === 0 && (
+              <p className="px-6 pb-6 text-sm font-semibold text-ink-500">No hay motos en el taller en este momento.</p>
+            )}
           </section>
         </main>
       </div>

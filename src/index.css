@@ -84,3 +84,89 @@ body {
     scroll-behavior: auto;
   }
 }
+
+/* ---------- Animación de entrada (Splash) ---------- */
+@keyframes splash-wheel-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes splash-bob {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-3px) rotate(-0.4deg);
+  }
+  50% {
+    transform: translateY(0) rotate(0.2deg);
+  }
+  75% {
+    transform: translateY(-2px) rotate(-0.3deg);
+  }
+}
+@keyframes splash-speed {
+  from {
+    transform: translateX(110vw);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  to {
+    transform: translateX(-30vw);
+    opacity: 0;
+  }
+}
+@keyframes splash-road {
+  to {
+    transform: translateX(-56px);
+  }
+}
+@keyframes splash-exit {
+  0% {
+    transform: translateX(0) rotate(0deg);
+  }
+  25% {
+    transform: translateX(-24px) rotate(-5deg);
+  }
+  100% {
+    transform: translateX(130vw) rotate(-1deg);
+  }
+}
+
+.splash-wheel {
+  animation: splash-wheel-spin 0.35s linear infinite;
+}
+.splash-bob {
+  animation: splash-bob 0.45s ease-in-out infinite;
+}
+.splash-speed {
+  right: 0;
+  animation: splash-speed 1s linear infinite;
+}
+.splash-road {
+  animation: splash-road 0.28s linear infinite;
+}
+.splash-exit {
+  animation: splash-exit 0.65s cubic-bezier(0.55, 0, 0.9, 0.4) forwards;
+}
+.splash-exit .splash-wheel {
+  animation-duration: 0.12s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .splash-wheel,
+  .splash-bob,
+  .splash-speed,
+  .splash-road {
+    animation: none;
+  }
+}
+
+/* Impresión del comprobante: la app se oculta y solo se imprime el documento */
+@media print {
+  @page { margin: 8mm; }
+  body > #root { display: none !important; }
+  #comprobante { position: static; width: 100%; max-width: 100%; }
+}

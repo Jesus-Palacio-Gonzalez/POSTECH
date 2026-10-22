@@ -52,7 +52,12 @@ VITE_SUPABASE_ANON_KEY=tu-anon-key
 | `/app` | Resumen (ruta protegida): negocio y rol reales, ventas, órdenes y stock bajo |
 | `/app/mostrador` | Venta de mostrador: buscador, carrito, formas de pago, cliente, comprobante imprimible |
 | `/app/ventas` | Historial de ventas, reimpresión del comprobante y anulación (dueño/admin) |
-| `/app/configuracion` | Datos fiscales y logo del negocio (edita dueño/admin) |
+| `/app/configuracion` | Datos fiscales, logo y **Equipo** (registrar mecánicos/cajeros con correo y contraseña; dueño/admin) |
+| `/app/ordenes` | Tablero del taller por estado (Recibida → Diagnóstico → Reparación → Lista) e historial; nueva orden por placa |
+| `/app/ordenes/:id` | Detalle: diagnóstico, mecánico, repuestos y mano de obra, impresión de la orden y «Entregar y cobrar» |
+| `/app/proveedores` | Compras a proveedores (pendiente → recibida, suma al stock) y directorio de proveedores (dueño/admin) |
+| `/app/reportes` | Ventas, más vendidos, utilidad bruta, taller por mecánico, valor del inventario, CSV (dueño/admin) |
+| `/app/inventario` | Catálogo: búsqueda, stock bajo, crear/editar productos, compatibilidad con motos y ajuste de stock (edita dueño/admin) |
 
 ## Pendientes por definir
 

@@ -11,6 +11,18 @@ Todo el modelo vive en **`supabase/schema.sql`**. Se ejecuta una sola vez en Sup
 
 Un usuario pertenece a **un** negocio (`perfiles.negocio_id`). Todas las tablas tienen `negocio_id` y RLS: nadie ve datos de otro negocio.
 
+## Registrar mecánicos y personal (Configuración → Equipo)
+
+El dueño o administrador crea el acceso con nombre, teléfono, correo y contraseña. Por dentro:
+
+1. se guarda una **invitación** para ese correo con el rol elegido (solo dueño/admin pueden, por RLS);
+2. se crea la cuenta con un cliente aparte que no guarda sesión (no te saca de la tuya);
+3. el trigger `handle_new_user` ve la invitación y mete a la persona **en tu negocio** con ese rol (no crea un negocio nuevo).
+
+El mecánico entra con ese correo y contraseña y aparece de inmediato en el selector de mecánico de las órdenes. Desde la misma sección se puede desactivar/activar a alguien y, solo el dueño, cambiar roles. No se usa la clave `service_role` (nunca debe ir en el navegador).
+
+> Si en Supabase → Authentication → Providers → Email tienes **Confirm email** activado, la persona debe confirmar el correo que le llega antes de entrar. Para que entre directo, desactiva esa opción. Si olvida la contraseña, usa «¿Olvidaste tu contraseña?» en el login.
+
 ## Roles (`rol_usuario`)
 
 | Rol | Puede |
@@ -50,4 +62,9 @@ supabase.rpc('buscar_productos', { p_texto: 'kit', p_modelo: modeloId })
 - `NegocioContext` lee `perfiles` (rol, nombre) con su `negocios`, y permite renombrar el negocio (dueño/admin).
 - `useResumen` (dashboard) lee `ventas` completadas de los últimos 7 días, `ordenes_taller` activas (con `motos` y mecánico) y `productos` con stock en o bajo el mínimo. Todo pasa por RLS: el mecánico solo ve sus órdenes y no ve ventas.
 - `Mostrador` usa `buscar_productos`, `registrar_venta` y `clientes`; `Ventas` lista `ventas` y llama `anular_venta`; `Configuración` actualiza `negocios` y el bucket `logos`.
+- `Órdenes` y `OrdenDetalle` usan `ordenes_taller`, `orden_items`, `motos`, `clientes` y la función `entregar_orden` (genera la venta y descuenta el stock al entregar; si falta un repuesto la entrega se bloquea). Los repuestos de una orden **no** descuentan stock hasta la entrega. El mecánico solo ve y avanza sus órdenes; no crea ni entrega.
+- `Inventario` usa `productos`, `categorias`, `producto_compatibilidad`, `movimientos_inventario` y `ajustar_stock`. El stock nunca se edita directo: se fija al crear el producto (stock inicial) y después solo con «Ajustar stock».
+- `Proveedores` usa `proveedores`, `compras`, `compra_items` y `recibir_compra`: la compra nace «pendiente» y el stock y el costo del producto se actualizan solo al recibirla (no se puede recibir dos veces ni editar una compra recibida). Solo dueño/admin.
+- `Reportes` (dueño/admin) lee `ventas`, `venta_items`, `ordenes_taller` y `productos`: ventas por día y método de pago, más vendidos, utilidad bruta (venta sin IVA − costo), órdenes por mecánico, valor del inventario y exportación CSV.
+- `Equipo` (Configuración) usa `perfiles` e `invitaciones` como se explicó arriba.
 - Si el negocio no tiene datos todavía, el dashboard muestra mensajes vacíos en vez de cifras de ejemplo.

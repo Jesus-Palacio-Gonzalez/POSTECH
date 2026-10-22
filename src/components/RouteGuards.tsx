@@ -1,6 +1,7 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useNegocio } from '../context/NegocioContext'
+import type { Rol } from '../context/NegocioContext'
 
 function Cargando() {
   return (
@@ -34,7 +35,16 @@ export function GuestRoute() {
 }
 
 /** Exige un perfil activo con negocio (lo crea el trigger de registro). Si falta, explica qué pasó. */
+function hostSupabase(): string {
+  try {
+    return new URL(import.meta.env.VITE_SUPABASE_URL as string).host
+  } catch {
+    return ''
+  }
+}
+
 export function NegocioGate() {
+  const host = hostSupabase()
   const { negocio, cargando, error, errorTecnico, recargar } = useNegocio()
   const { signOut } = useAuth()
 
@@ -48,7 +58,7 @@ export function NegocioGate() {
             {error ??
               'Tu cuenta no tiene un negocio activo. Si te invitaron a un equipo, pide a tu administrador que reactive tu acceso.'}
           </p>
-          {errorTecnico && <p className="mt-3 break-words text-left text-xs font-mono text-ink-500">Detalle técnico: {errorTecnico}</p>}
+          {errorTecnico && <p className="mt-3 break-words text-left text-xs font-mono text-ink-500">Detalle técnico: {errorTecnico}{host ? ` · proyecto: ${host}` : ''}</p>}
           <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
             <button
               type="button"
@@ -70,4 +80,10 @@ export function NegocioGate() {
     )
   }
   return <Outlet />
+}
+
+/** Deja pasar solo a ciertos roles; el resto vuelve al resumen. */
+export function SoloRoles({ roles }: { roles: Rol[] }) {
+  const { rol } = useNegocio()
+  return rol && roles.includes(rol) ? <Outlet /> : <Navigate to="/app" replace />
 }

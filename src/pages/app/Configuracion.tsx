@@ -2,6 +2,7 @@ import { useRef, useState } from 'react'
 import type { ChangeEvent, FormEvent } from 'react'
 import { ImagePlus } from 'lucide-react'
 import { useNegocio } from '../../context/NegocioContext'
+import { Equipo } from '../../components/Equipo'
 
 const campo =
   'w-full border-2 border-ink-950 bg-white px-3 py-2.5 text-sm font-semibold outline-none focus:border-brand-500 disabled:bg-ink-100 disabled:text-ink-500'
@@ -79,7 +80,7 @@ export default function Configuracion() {
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <div>
-        <h1 className="display text-5xl text-ink-950">Configuración</h1>
+        <h1 className="display text-4xl text-ink-950 sm:text-5xl">Configuración</h1>
         <p className="mt-2 font-semibold text-ink-700">
           {puede
             ? 'Estos datos salen en el encabezado de cada comprobante.'
@@ -171,6 +172,8 @@ export default function Configuracion() {
           </button>
         )}
       </form>
+
+      {puede && <Equipo />}
     </div>
   )
 }

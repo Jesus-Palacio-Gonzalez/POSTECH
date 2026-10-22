@@ -30,16 +30,17 @@ interface Modulo {
   end?: boolean
 }
 
+const ADMINS: Rol[] = ['dueno', 'admin']
 const VENDEN: Rol[] = ['dueno', 'admin', 'cajero']
 
 const modulos: Modulo[] = [
   { icon: LayoutDashboard, label: 'Resumen', to: '/app', end: true },
   { icon: ShoppingCart, label: 'Mostrador', to: '/app/mostrador', roles: VENDEN },
   { icon: Receipt, label: 'Ventas', to: '/app/ventas', roles: VENDEN },
-  { icon: ClipboardList, label: 'Órdenes de taller' },
-  { icon: Boxes, label: 'Inventario' },
-  { icon: Truck, label: 'Proveedores' },
-  { icon: Gauge, label: 'Reportes' },
+  { icon: ClipboardList, label: 'Órdenes de taller', to: '/app/ordenes' },
+  { icon: Boxes, label: 'Inventario', to: '/app/inventario' },
+  { icon: Truck, label: 'Proveedores', to: '/app/proveedores', roles: ADMINS },
+  { icon: Gauge, label: 'Reportes', to: '/app/reportes', roles: ADMINS },
   { icon: Settings, label: 'Configuración', to: '/app/configuracion' },
 ]
 
@@ -47,6 +48,10 @@ const titulos: Record<string, string> = {
   '/app': 'Resumen',
   '/app/mostrador': 'Mostrador',
   '/app/ventas': 'Ventas',
+  '/app/ordenes': 'Órdenes de taller',
+  '/app/inventario': 'Inventario',
+  '/app/proveedores': 'Proveedores',
+  '/app/reportes': 'Reportes',
   '/app/configuracion': 'Configuración',
 }
 
@@ -156,7 +161,8 @@ export default function AppLayout() {
 
   const meta = (user?.user_metadata ?? {}) as { full_name?: string; name?: string }
   const nombre = meta.full_name || meta.name || user?.email?.split('@')[0] || 'Usuario'
-  const titulo = titulos[pathname.replace(/\/$/, '')] ?? 'Panel'
+  const limpia = pathname.replace(/\/$/, '')
+  const titulo = titulos[limpia] ?? (limpia.startsWith('/app/ordenes/') ? 'Orden de taller' : 'Panel')
 
   return (
     <div className="min-h-screen bg-ink-50 lg:grid lg:grid-cols-[17rem_1fr]">
